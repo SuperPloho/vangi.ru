@@ -22,7 +22,7 @@ templateForPressure = re.compile(b'<div class=\"p_0\">[<b>]{0,3}(\d+)[</b>]{0,3}
 templateForWet = re.compile(b'\)\">[<b>]{0,3}(\d+)</td>') # регулярное выражение для "Влажность, %"
 templateForCloudiness = re.compile(b'<div class=\"cc_0\">.+<b>(.+)</b><br/>\((.+)\)\'') # регулярное выражение для "Облачность, %"
 templateForPhenomenon = re.compile(b'<div class=\"pr_0\".+\'(.+)\' ,') # регулярное выражение для "Явления погоды"
-templateForPhenomenon1 = re.compile(b' class=\" litegrey .{1,2}.+\%\" .+\'(.+)\' ,') # регулярное выражение для "Явления погоды1"
+#templateForPhenomenon1 = re.compile(b' class=\" litegrey .{1,2}.+\%\" .+\'(.+)\' ,') # регулярное выражение для "Явления погоды1"
 
 tempr = templateForTempr.findall(codeRP5) # получаем значения температуры
 feelLikeTempr = templateForFeelLike.findall(codeRP5) # получаем значение "ощущается как"
@@ -30,7 +30,7 @@ pressure = templateForPressure.findall(codeRP5) # получаем значен�
 wet = templateForWet.findall(codeRP5) # получаем значения влажности
 cloudiness = templateForCloudiness.findall(codeRP5) # получаем значения облачности
 phenomenon = templateForPhenomenon.findall(codeRP5) # получаем значения явлений погоды
-phenomenon1 = templateForPhenomenon1.findall(codeRP5) # получаем значения явлений погоды
+#phenomenon1 = templateForPhenomenon1.findall(codeRP5) # получаем значения явлений погоды
 
 convertToNormalView(tempr, b'')
 convertToNormalView(cloudiness, b' ')
@@ -41,7 +41,7 @@ convertByteToString(pressure)
 convertByteToString(wet)
 convertByteToString(cloudiness)
 convertByteToString(phenomenon)
-convertByteToString(phenomenon1)
+#convertByteToString(phenomenon1)
 
 print(tempr)
 print(feelLikeTempr)
@@ -49,4 +49,4 @@ print(pressure)
 print(wet)
 print(cloudiness)
 print(phenomenon)
-print(phenomenon1)
+#print(phenomenon1)
