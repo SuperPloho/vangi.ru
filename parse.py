@@ -11,12 +11,17 @@ def convertToNormalView(array, separator):
         array[i] = list(array[i])
         array[i] = separator.join(array[i])
 
+def deleteExcessElement(array):
+    lenght = len(array) - 1
+    for i in range(0, (int)(lenght / 2)):
+        del array[i + 1]
+
 infoPage = urllib.request.urlopen("http://rp5.ru/3034/ru") # получаем код сайта rp5 погода в Екатеринбурге
 codeRP5 = infoPage.read() # записываем код в переменную
 
 templateForFeelLike = re.compile(b'<div class=\"t_0\">([+-]?\d+)</b></div>') # регулярное выражение для "Ощущается как, °C"
 templateForTempr = re.compile(b'<div class=\"t_0\"><b>([+-]?).{0,28}(\d+)</b></div>') # регулярное выражение для "Температура, °C"
-templateForPressure = re.compile(b'<div class=\"p_0\">[<b>]{0,3}(\d+)[</b>]{0,3}</div>') # регулярное выражение для "Давление, мм рт. ст."
+templateForPressure = re.compile(b'<div class=\"p_0\">[<b>]{0,3}(\d+)[</b>]{0,4}</div>') # регулярное выражение для "Давление, мм рт. ст."
 templateForWet = re.compile(b'\)\">[<b>]{0,3}(\d+)</td>') # регулярное выражение для "Влажность, %"
 templateForCloudiness = re.compile(b'<div class=\"cc_0\">.+<b>(.+)</b><br/>\((.+)\)\'') # регулярное выражение для "Облачность, %"
 templateForPhenomenon = re.compile(b'<div class=\"pr_0\".+\'(.+)\' ,') # регулярное выражение для "Явления погоды"
@@ -50,13 +55,24 @@ convertByteToString(time)
 convertByteToString(speed)
 convertByteToString(direction)
 
+deleteExcessElement(phenomenon)
+
 print(tempr)
+print(len(tempr))
 print(feelLikeTempr)
+print(len(feelLikeTempr))
 print(pressure)
+print(len(pressure))
 print(wet)
+print(len(wet))
 print(cloudiness)
+print(len(cloudiness))
 print(phenomenon)
+print(len(phenomenon))
 #print(phenomenon1)
 print(time)
+print(len(time))
 print(speed)
+print(len(speed))
 print(direction)
+print(len(direction))
