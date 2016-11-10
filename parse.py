@@ -1,6 +1,4 @@
-# вытащили температуру, ощущается как, давление и влажность
-# осталось местное время - сконвертировать, облачность/явления погоды, ветер
-# солнце/луна/фаза - надо или нет?
+# осталось местное время - сконвертировать
 import urllib.request
 import re
 
@@ -23,6 +21,9 @@ templateForWet = re.compile(b'\)\">[<b>]{0,3}(\d+)</td>') # регулярное
 templateForCloudiness = re.compile(b'<div class=\"cc_0\">.+<b>(.+)</b><br/>\((.+)\)\'') # регулярное выражение для "Облачность, %"
 templateForPhenomenon = re.compile(b'<div class=\"pr_0\".+\'(.+)\' ,') # регулярное выражение для "Явления погоды"
 #templateForPhenomenon1 = re.compile(b' class=\" litegrey .{1,2}.+\%\" .+\'(.+)\' ,') # регулярное выражение для "Явления погоды1"
+templateForTime = re.compile(b'<td colspan=\"2\" class=\".{1,2} underlineRow\">(\d+)</td>') # регулярное выражение для времени
+templateForWindSpeed = re.compile(b'<div class=\"wv_0\".+\((\d+) ') # регулярное выражение для скорости ветра
+templateForWindDirection = re.compile(b'class=\"grayLittle[nd2]{0,3}.+?\">(.{0,5})</td>') # регулярное выражение для направления ветра
 
 tempr = templateForTempr.findall(codeRP5) # получаем значения температуры
 feelLikeTempr = templateForFeelLike.findall(codeRP5) # получаем значение "ощущается как"
@@ -31,6 +32,9 @@ wet = templateForWet.findall(codeRP5) # получаем значения вла
 cloudiness = templateForCloudiness.findall(codeRP5) # получаем значения облачности
 phenomenon = templateForPhenomenon.findall(codeRP5) # получаем значения явлений погоды
 #phenomenon1 = templateForPhenomenon1.findall(codeRP5) # получаем значения явлений погоды
+time = templateForTime.findall(codeRP5) # получаем значение времени
+speed = templateForWindSpeed.findall(codeRP5) # получаем значение скорости ветра
+direction = templateForWindDirection.findall(codeRP5) # получаем значение направления ветра
 
 convertToNormalView(tempr, b'')
 convertToNormalView(cloudiness, b' ')
@@ -42,6 +46,9 @@ convertByteToString(wet)
 convertByteToString(cloudiness)
 convertByteToString(phenomenon)
 #convertByteToString(phenomenon1)
+convertByteToString(time)
+convertByteToString(speed)
+convertByteToString(direction)
 
 print(tempr)
 print(feelLikeTempr)
@@ -50,3 +57,6 @@ print(wet)
 print(cloudiness)
 print(phenomenon)
 #print(phenomenon1)
+print(time)
+print(speed)
+print(direction)
