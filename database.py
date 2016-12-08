@@ -1,13 +1,23 @@
 from sqlalchemy import create_engine
-engine = create_engine('postgresql:///some.db')
+engine = create_engine('postgresql://postgres:1@localhost:5432/Weather')
 
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Table
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, mapper
 #from sqlalchemy import Sequence
 from sqlalchemy.dialects.postgresql import JSON
+
+Forecast_Geobject = Table('forecast_geobjects', Base.metadata,
+    Column('forecast_id', Integer, ForeignKey('forecasts.id')),
+    Column('geobject_id', Integer, ForeignKey('objects.id'))
+)
+
+Forecast_Source = Table('forecast_source', Base.metadata,
+    Column('forecast_id', Integer, ForeignKey('forecasts.id')),
+    Column('source_id', Integer, ForeignKey('sources.id'))
+)
 
 class Source(Base):
     __tablename__ = 'sources'
@@ -16,6 +26,10 @@ class Source(Base):
     name = Column(String(50))
     url = Column(String(100))
     data = Column(String(100))
+
+    forecasts = relationship('Forecast', 
+                    secondary = Forecast_Source,
+                    back_populates = 'sources')
 
 class Real(Base):
     __tablename__ = 'real'
@@ -35,10 +49,10 @@ class Forecast(Base):
     data = Column(JSON)
     objects = relationship('Geobject', 
                         secondary = Forecast_Geobject,
-                        backref = 'Forecast')
+                        back_populates = 'forecasts')
     sources = relationship('Source', 
                         secondary = Forecast_Source,
-                        backref = 'Forecast')
+                        back_populates = 'forecasts')
 
 class Geobject(Base):
     __tablename__ = 'objects'
@@ -47,12 +61,8 @@ class Geobject(Base):
     name = Column(String(50))
     gps = Column(String(100))
 
-Forecast_Geobject = Table('forecast_geobjects', Base.metadata,
-Column('forecast_id', Integer, ForeignKey('forecasts.id')),
-Column('geobject_id', Integer, ForeignKey('objects.id'))
-)
+    forecasts = relationship('Forecast', 
+                secondary = Forecast_Geobject,
+                back_populates = 'objects')
 
-Forecast_Source = Table('forecast_source', Base.metadata,
-Column('forecast_id', Integer, ForeignKey('forecasts.id')),
-Column('source_id', Integer, ForeignKey('sources.id'))
-)
+Base.metadata.create_all(engine)
