@@ -1,46 +1,68 @@
 from sqlalchemy import create_engine
-from sqlalchemy import MetaData, DateTime, String, Integer 
-from sqlalchemy import Column, Table, ForeignKey
-from sqlalchemy.dialects.postgresql import JSON, JSONB
+engine = create_engine('postgresql://postgres:1@localhost:5432/Weather')
 
-import os
+from sqlalchemy.ext.declarative import declarative_base
+Base = declarative_base()
 
-if os.path.exists("some.db"):
-    os.remove("some.db")
-engine = create_engine("sqlite:///some.db")
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Table
+from sqlalchemy.orm import relationship, mapper
+#from sqlalchemy import Sequence
+from sqlalchemy.dialects.postgresql import JSON
 
-metadata = MetaData(engine)
+Forecast_Geobject = Table('forecast_geobjects', Base.metadata,
+    Column('forecast_id', Integer, ForeignKey('forecasts.id')),
+    Column('geobject_id', Integer, ForeignKey('objects.id'))
+)
 
-source_table = Table('source',
-               Column('ID_source', Integer, primary_key=True),
-               Column('name', String(50)),
-               Column('url', String(100)),
-               Column('data', String(100))
-               )
+Forecast_Source = Table('forecast_source', Base.metadata,
+    Column('forecast_id', Integer, ForeignKey('forecasts.id')),
+    Column('source_id', Integer, ForeignKey('sources.id'))
+)
 
-real_table = Table('real', metadata,
-              # Column('param', source_table)
-               Column('ID_source', Integer, primary_key=True),
-               Column('name', String(50)),
-               Column('address', String(100)),
-               Column('data', String(100))
-               )
+class Source(Base):
+    __tablename__ = 'sources'
 
-forecastTable = Table('forecast', metadata,
-               Column('ID_object', Integer, primary_key=True),
-               Column('Priority', String(3)),
-               Column('Update_DateTime', DateTime),
-               Column('DateTime', DateTime),
-               Column('Data', JSONB)
-               # Column('Predicted_forecast', predicted_table),
-               # Column('Real_forecast', real_table)
-               )
+    id = Column(Integer, primary_key = True)
+    name = Column(String(50))
+    url = Column(String(100))
+    data = Column(String(100))
 
-object_table = Table('object', metadata,
-                Column('ID_object', Integer, primary_key=True),
-                Column('Name', String(50)),
-                Column('GPS', String(50)),
-                # Column('TimeZone', DateTime)
-                )
- 
-metadata.create_all()
+    forecasts = relationship('Forecast', 
+                    secondary = Forecast_Source,
+                    back_populates = 'sources')
+
+class Real(Base):
+    __tablename__ = 'real'
+
+    id = Column(Integer, primary_key = True)
+    name = Column(String(50))
+    address = Column(String(100))
+    data = Column(String(100))
+
+class Forecast(Base):
+    __tablename__ = 'forecasts'
+
+    id = Column(Integer, primary_key = True)
+    priority = Column(String(3))
+    update_DateTime = Column(DateTime)
+    dateTime = Column(DateTime)
+    data = Column(JSON)
+    objects = relationship('Geobject', 
+                        secondary = Forecast_Geobject,
+                        back_populates = 'forecasts')
+    sources = relationship('Source', 
+                        secondary = Forecast_Source,
+                        back_populates = 'forecasts')
+
+class Geobject(Base):
+    __tablename__ = 'objects'
+
+    id = Column(Integer, primary_key = True)
+    name = Column(String(50))
+    gps = Column(String(100))
+
+    forecasts = relationship('Forecast', 
+                secondary = Forecast_Geobject,
+                back_populates = 'objects')
+
+Base.metadata.create_all(engine)
