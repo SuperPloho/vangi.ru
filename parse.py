@@ -42,6 +42,7 @@ speed = templateForWindSpeed.findall(codeRP5) # получаем значени�
 direction = templateForWindDirection.findall(codeRP5) # получаем значение направления ветра
 
 convertToNormalView(tempr, b'')
+#convertToNormalView(feelLikeTempr, b'')
 convertToNormalView(cloudiness, b' ')
 
 convertByteToString(tempr)
@@ -76,3 +77,26 @@ print(speed)
 print(len(speed))
 print(direction)
 print(len(direction))
+
+
+from sqlalchemy import create_engine
+#engine = create_engine('postgresql://postgres:1@localhost:5432/Weather')
+
+from datetime import datetime
+now = datetime.today()
+
+from database import Forecast, engine
+
+from sqlalchemy.orm import Session
+session = Session(bind=engine)
+
+for key, value in enumerate(tempr):
+    session.add(
+        Forecast(
+            priority='1',
+            date_time=now,
+            update_datetime=now
+        )
+    )
+
+session.commit()
