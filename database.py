@@ -1,14 +1,14 @@
 import datetime
 from sqlalchemy import create_engine
-#engine = create_engine('postgresql://postgres:1@localhost:5432/Weather')
-engine = create_engine('sqlite:///weather.sqlite')
+engine = create_engine('postgresql://postgres:1@localhost:5432/Weather')
+# engine = create_engine('sqlite:///weather.sqlite')
 
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Table
 from sqlalchemy.orm import relationship, mapper
-#from sqlalchemy import Sequence
+from sqlalchemy import Sequence
 from sqlalchemy.dialects.postgresql import JSON
 
 Forecast_Geobject = Table('forecast_geobjects', Base.metadata,
@@ -48,7 +48,7 @@ class Forecast(Base):
     priority = Column(String(3), nullable=False)
     update_datetime = Column(DateTime)
     date_time = Column(DateTime)
-    #data = Column(JSON)
+    data = Column(JSON)
     objects = relationship('Geobject', 
                         secondary = Forecast_Geobject,
                         back_populates = 'forecasts')
