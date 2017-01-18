@@ -22,6 +22,7 @@ def delete_excess_element(array):
     for i in range(0, (int)(lenght / 2)):
         del array[i + 1]
 
+
 # получаем код сайта rp5 погода в Екатеринбурге
 INFO_PAGE = urllib.request.urlopen("http://rp5.ru/3034/ru")
 CODERP5 = INFO_PAGE.read() # записываем код в переменную
@@ -49,7 +50,7 @@ speed = template_for_wind_speed.findall(CODERP5) # получаем значен
 direction = template_for_wind_direction.findall(CODERP5) # получаем значение направления ветра
 
 convert_to_normal_view(tempr, b'')
-#convert_to_normal_view(feelLikeTempr, b'')
+# convert_to_normal_view(feelLikeTempr, b'')
 convert_to_normal_view(cloudiness, b' ')
 
 convert_byte_to_string(tempr)
@@ -77,19 +78,18 @@ print(cloudiness)
 print(len(cloudiness))
 print(phenomenon)
 print(len(phenomenon))
-#print(phenomenon1)
 print(time)
 print(len(time))
 print(speed)
 print(len(speed))
 print(direction)
 print(len(direction))
-'''
+
 ENGINE = create_engine('postgresql://postgres:1@localhost:5432/Weather')
 SESSION = Session(bind=ENGINE)
 NOW = datetime.today()
 
-for key, value in enumerate(tempr):
+for key, value in enumerate(feelLikeTempr):
     SESSION.add(
         Forecast(
             id=key,
@@ -109,3 +109,47 @@ for key, value in enumerate(tempr):
         )
     )
 SESSION.commit()
+'''
+from wsgiref.simple_server import make_server
+from pyramid.config import Configurator
+from pyramid.response import Response
+
+def index(request):
+    return Response("""<a href="index.html">Относительная</a> | <a href="C:/WebServers/home/myproject/index.html">Абсолютная</a>""")
+def about(request):
+    return Response("""<a href="about/aboutme.html">Относительная</a> | <a href="C:/WebServers/home/myproject/about/abotme.html">Абсолютная</a>""")
+'''
+def weather_(request):
+    for key, value in enumerate(feelLikeTempr):
+        return Response(
+            "Дата: " + time[key] + "<hr>" +
+            "Температура: "+ feelLikeTempr[key]+ "<br>" +
+            "Давление: "+ pressure[key]+"<br>" +
+            "Влажность: "+ wet[key]+"<br>" +
+            "Ожидаемая: "+ tempr[key]+"<br>" +
+            "Облачность: "+ cloudiness[key]+"<br>" +
+            "Явление погоды: "+ phenomenon[key]+"<br>" +
+            "Скорость: "+ speed[key]+"<br>" +
+            "Направление: "+ direction[key]
+        )
+'''  
+def weather(request):
+    ENGINE = create_engine('postgresql://postgres:1@localhost:5432/Weather')
+    SESSION = Session(bind=ENGINE)
+    result = engine.execute(
+                 "select data from "
+                 "forecasts")
+    row = result.fetchall()
+    return Response(str(row))
+
+if __name__ == '__main__':
+    config = Configurator()
+    config.add_route('index', '/')
+    config.add_view(index, route_name='index')
+    config.add_route('about', 'about')
+    config.add_view(about, route_name='about')
+    config.add_route('weather', 'weather')
+    config.add_view(weather, route_name='weather')
+    app = config.make_wsgi_app()
+    server = make_server('0.0.0.0', 8000, app)
+    server.serve_forever()
