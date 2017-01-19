@@ -1,6 +1,6 @@
 import re
 import urllib.request
-from datetime import datetime
+from datetime import datetime, date, time
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -39,7 +39,7 @@ template_for_pressure = re.compile(b'<div class=\"p_0\">[<b>]{0,3}(\d+)[</b>]{0,
 # регулярное выражение для "Влажность, %"
 template_for_wet = re.compile(b'\)\">[<b>]{0,3}(\d+)</td>')
 # регулярное выражение для "Облачность, %"
-template_for_cloudiness = re.compile(b'<div class=\"cc_0\">.+<b>(.+)</b><br/>\((.+)\)\'')
+template_for_cloudiness = re.compile(b'<div class=\"cc_0\">.+<b>(.+)</b><br/>.+\'')
 # регулярное выражение для "Явления погоды"
 template_for_phenomenon = re.compile(b'<div class=\"pr_0\".+\'(.+)\' ,')
 
@@ -70,7 +70,7 @@ phenomenon = template_for_phenomenon.findall(CODERP5)
 # phenomenon1 = template_for_phenomenon1.findall(CODERP5)
 
 # получаем значение времени
-time = template_for_time.findall(CODERP5)
+TIME = template_for_time.findall(CODERP5)
 # получаем значение скорости ветра
 speed = template_for_wind_speed.findall(CODERP5)
 # получаем значение направления ветра
@@ -78,7 +78,7 @@ direction = template_for_wind_direction.findall(CODERP5)
 
 convert_to_normal_view(tempr, b'')
 # convert_to_normal_view(feel_like_tempr, b'')
-convert_to_normal_view(cloudiness, b' ')
+# convert_to_normal_view(cloudiness, b' ')
 
 convert_byte_to_string(tempr)
 convert_byte_to_string(feel_like_tempr)
@@ -87,7 +87,7 @@ convert_byte_to_string(wet)
 convert_byte_to_string(cloudiness)
 convert_byte_to_string(phenomenon)
 # convert_byte_to_string(phenomenon1)
-convert_byte_to_string(time)
+convert_byte_to_string(TIME)
 convert_byte_to_string(speed)
 convert_byte_to_string(direction)
 
@@ -140,16 +140,8 @@ SESSION.commit()
 from wsgiref.simple_server import make_server
 from pyramid.config import Configurator
 from pyramid.response import Response
+from pyramid.renderers import render
 
-
-def index(request):
-    return Response("""<a href="index.html">Относительная</a> |
-    <a href="C:/WebServers/home/myproject/index.html">Абсолютная</a>""")
-
-
-def about(request):
-    return Response("""<a href="about/aboutme.html">Относительная</a> |
-    <a href="C:/WebServers/home/myproject/about/abotme.html">Абсолютная</a>""")
 '''
 def weather_(request):
     for key, value in enumerate(feel_like_tempr):
@@ -164,8 +156,44 @@ def weather_(request):
             "Скорость: "+ speed[key]+"<br>" +
             "Направление: "+ direction[key]
         )
-'''
 
+from  time import time
+
+def whats_time(TIME):
+    for key, value in enumerate(feel_like_tempr):
+        NOW = datetime.today()
+        date = int(TIME[key])*3600 + NOW.second
+        TIME[key] = time.ctime(time(date))
+        return TIME
+
+DATE = whats_time(TIME)
+'''    
+
+NOW = datetime.today()
+
+def days(count):
+    for key in range(0,23):
+        if (key % 4 == 0) and (key != 0):
+            count = count + 1 
+        DDATE = date(NOW.year, NOW.month , int(NOW.day+count))
+        TTIME = time(int(TIME[key]), 0)
+        TIME[key] = datetime.combine(DDATE, TTIME)
+        # TIME[key].strftime("%a, %d.%b.%y %H:%M")
+
+days(0)
+
+qwe = range(0,23)
+asdzxc = {'city': 'Екб', 'Date': TIME, 'Temperature': tempr, 
+        'FLT': feel_like_tempr, 'Pressure': pressure, 'Wet': wet, 
+        'Cloudinass': cloudiness, 'Phenomenon': phenomenon, 'Speed': speed, 
+        'Direction': direction, 'qwe': qwe}
+
+def sample_view(request):
+    result = render('templates/index.jinja2',
+                    asdzxc,
+                    request=request)
+    response = Response(result)
+    return response
 
 def weather(request):
     ENGINE = create_engine('postgresql://postgres:1@localhost:5432/Weather')
@@ -178,12 +206,11 @@ def weather(request):
 
 if __name__ == '__main__':
     config = Configurator()
-    config.add_route('index', '/')
-    config.add_view(index, route_name='index')
-    config.add_route('about', 'about')
-    config.add_view(about, route_name='about')
     config.add_route('weather', 'weather')
     config.add_view(weather, route_name='weather')
+    config.include('pyramid_jinja2')
+    config.add_route('asd', '/asd')
+    config.add_view(sample_view, route_name='asd')
     app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 8000, app)
     server.serve_forever()
