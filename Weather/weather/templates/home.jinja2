@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Погода</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="static/js/jquery-3.1.1.js"></script>
+	<script src="static/js/bootstrap.js"></script>
+	<link rel='stylesheet' href='static/bootstrap.min.css' type='text/css' media='all'>
+</head>
+<body>
+	<div class="MainPosition">
+	<div class="yourCity">Ваш город <a href="/Екатеринбург-6сут">Екатеринбург?</a></div>
+	<div style="float: right; margin-bottom: 13px;">или вы можете выбрать другой город</div>
+	<form id="SearchForm" style="margin-bottom: 40px;" action="/" method="post">
+		<input type="text" id="txt" name="input">
+		<!--<input type="submit" id="btn" value="Показать" >-->
+		<div class="dropdown">
+			<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+				Показать
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+				<li><button class="btn btn-default dropdown-toggle type="submit" id="Day" >На сутки</button></li>
+				<li><button class="btn btn-default dropdown-toggle type="submit" id="ThreeDays">На 3 суток</button></li>
+				<li><button class="btn btn-default dropdown-toggle type="submit" id="SixDays" >На 6 суток</button></li>
+			</ul>
+		</div>
+		<script>
+			function SearchFunc1(){
+			var text = document.getElementsByTagName("input")[0];
+			var val = text.value;
+			var buf = encodeURIComponent(val) + "-1сут"
+			SearchForm.action += buf;
+			}
+			
+			function SearchFunc3(){
+			var text = document.getElementsByTagName("input")[0];
+			var val = text.value;
+			var buf = encodeURIComponent(val) + "-3сут"
+			SearchForm.action += buf;
+			}
+			
+			function SearchFunc6(){
+			var text = document.getElementsByTagName("input")[0];
+			var val = text.value;
+			var buf = encodeURIComponent(val) + "-6сут"
+			SearchForm.action += buf;
+			}			
+			
+			function SearchFunc(){
+			/*var text = document.getElementsByTagName("input")[0];
+			var val = text.value;*/
+				document.getElementById("Day").onclick = SearchFunc1;
+				document.getElementById("ThreeDays").onclick = SearchFunc3;
+				document.getElementById("SixDays").onclick = SearchFunc6;
+			/*SearchForm.action += encodeURIComponent(val);*/
+			}
+			document.getElementById("dropdownMenu1").onclick = SearchFunc;
+			
+			
+		</script>	
+	</form>
+	<div>
+		<div style="text-align: center; font-size: 13pt; margin-bottom: 15px;">Список 5 самых популярных городов:</div>
+		<div class="TopFive">
+			<ol>
+				<li><a href="/Москва-6сут">Москва</a></li>
+				<li><a href="/Санкт-Петербург-6сут">Санкт-Петербург</a></li>
+				<li><a href="/Казань-6сут">Казань</a></li>
+				<li><a href="/Екатеринбург-6сут">Екатеринбург</a></li>
+				<li id="last"><a href="/Новосибирск-6сут">Новосибирск</a></li>
+			</ol>
+		</div>
+	</div>
+	</div>
+	
+
+
+
+</body>
+</html>

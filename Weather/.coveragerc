@@ -1,0 +1,3 @@
+[run]
+source = weather
+omit = weather/test*

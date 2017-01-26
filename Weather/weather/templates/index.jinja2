@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Погода {{city}}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel='stylesheet' href='static/bootstrap.min.css' type='text/css' media='all'>
+</head>
+<body>
+	<div class="city"> 
+		{{city}}
+	</div>
+	<table>
+	<thead>
+	<tr>
+		<th>Дата</th>
+		<th>Температура, °C</th>
+		<th>Ощущается как, °C</th>
+		<th>Давление, мм рт. ст.</th>
+		<th>Влажность, %</th>
+		<th>Облачность, %</th>
+		<th>Явление погоды</th>
+		<th>Ветер: скорость, м/с</th>
+		<th>Направление</th>
+	</tr>
+	</thead>
+	<tbody>
+		{% for c in qwe %}
+		<tr>
+			<td>
+				{{Date[c]}}
+			</td>
+			<td>
+				{{Temperature[c]}}
+			</td>
+			<td>
+				{{FLT[c]}}
+			</td>
+			<td>
+				{{Pressure[c]}}
+			</td>
+			<td>
+				{{Wet[c]}}
+			</td>
+			<td>
+				{{Cloudinass[c]}}
+			</td>
+			<td>
+				{% if Phenomenon[c] == "Явления погоды отсутствуют" %}
+   					—
+				{% else %}
+					{{Phenomenon[c]}}
+  				{% endif %}
+			</td>
+			<td>
+				{{Speed[c]}}
+			</td>
+			<td>
+				{{Direction[c]}}
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+	</table>
+</body>
+</html>
